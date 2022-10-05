@@ -2023,6 +2023,39 @@ void AdminHandler::run()
     printf("%s\n", resbuf.c_str());
 }
 
+void BucketListHandler::run()
+{
+    fprintf(stderr, "Requesting %s\n", getURI().c_str());
+    HttpBaseHandler::run();
+    if (o_raw.result()) {
+        printf("%s\n", resbuf.c_str());
+    } else {
+        format();
+    }
+}
+
+void BucketListHandler::format()
+{
+    Json::Value json;
+    if (!Json::Reader().parse(resbuf, json)) {
+        fprintf(stderr, "Failed to parse response as JSON, falling back to raw mode\n");
+        printf("%s\n", resbuf.c_str());
+    }
+
+    // std::map<string, string> roles;
+    // size_t max_width = 0;
+    // for (auto role : json) {
+    //     string role_id = role["role"].asString() + ": ";
+    //     roles[role_id] = role["desc"].asString();
+    //     if (max_width < role_id.size()) {
+    //         max_width = role_id.size();
+    //     }
+    // }
+    // for (auto &role : roles) {
+    //     std::cout << std::left << std::setw(max_width) << role.first << role.second << std::endl;
+    // }
+}
+
 void BucketCreateHandler::run()
 {
     const string &name = getRequiredArg();
@@ -2278,6 +2311,7 @@ static const char *optionsOrder[] = {"help",
                                      "analytics",
                                      "search",
                                      "admin",
+                                     "bucket-list",
                                      "bucket-create",
                                      "bucket-delete",
                                      "bucket-flush",
@@ -2369,6 +2403,7 @@ static void setupHandlers()
     handlers_s["incr"] = new IncrHandler();
     handlers_s["decr"] = new DecrHandler();
     handlers_s["admin"] = new AdminHandler();
+    handlers_s["bucket-list"] = new BucketListHandler();
     handlers_s["bucket-create"] = new BucketCreateHandler();
     handlers_s["bucket-delete"] = new BucketDeleteHandler();
     handlers_s["bucket-flush"] = new BucketFlushHandler();
